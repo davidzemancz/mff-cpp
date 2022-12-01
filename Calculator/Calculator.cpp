@@ -1,7 +1,7 @@
 // Calculator.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-// https://fan1x.github.io/cpp22.html#
+// https://fan1x.github.io/cpp22.html
 
 #include <iostream>
 

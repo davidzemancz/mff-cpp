@@ -1,20 +1,43 @@
-// DataAggregation.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
+#include <fstream>
+#include <string>
+#include<tuple>
+#include <map>
+
+using namespace std;
+
+map<char, char> my_map = {
+    { 'A', '1' },
+    { 'B', '2' },
+    { 'C', '3' }
+};
+
+void readinput()
+{
+    string line;
+    while (getline(cin, line))  //input from the file in.txt
+    {
+        cout << line << endl;   //output to the file out.txt
+    }
+}
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    const string inFile = "C:\\Users\\david\\OneDrive\\MFFUK\\3-1\\C++\\mff-cpp\\Docs\\test.input";
+    const string outFile = "C:\\Users\\david\\OneDrive\\MFFUK\\3-1\\C++\\mff-cpp\\Docs\\test1.output";
+    
+    ifstream in(inFile);
+    streambuf* cinbuf = cin.rdbuf(); //save old buf
+    cin.rdbuf(in.rdbuf()); //redirect cin to in.txt!
+
+    ofstream out(outFile);
+    streambuf* coutbuf = cout.rdbuf(); //save old buf
+    cout.rdbuf(out.rdbuf()); //redirect cout to out.txt!
+
+    readinput(); 
+
+    cin.rdbuf(cinbuf);   //reset to standard input again
+    cout.rdbuf(coutbuf); //reset to standard output agai
+
+    return 0;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
