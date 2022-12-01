@@ -6,7 +6,7 @@
 
 using namespace std;
 
-map<char, char> my_map = {
+map<string, char> my_map = {
     { 'A', '1' },
     { 'B', '2' },
     { 'C', '3' }
