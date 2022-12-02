@@ -58,7 +58,7 @@ DataFrame readData(string& query)
 }
 
 void writeData(const DataFrame& df) {
-	df.debugPrint();
+	//df.debugPrint();
 }
 
 int main()
