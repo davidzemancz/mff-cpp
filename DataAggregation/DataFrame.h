@@ -9,7 +9,7 @@ using namespace std;
 class DataFrame
 {
 private:
-	vector<DataFrameCol> cols;
+	map<string, DataFrameCol> cols;
 	vector<vector<string>> rows;
 public:
 	DataFrame();

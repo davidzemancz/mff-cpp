@@ -47,6 +47,7 @@ DataFrame readData(string& query)
 	string row;
 	for (size_t r = 0; r <= rowsCount; r++) {
 		getline(cin, row);
+		if (row == "") continue;
 		vector<string> rowVctr = strSplit(row, D);
 		df.addRowVctr(rowVctr);
 	}

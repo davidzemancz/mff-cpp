@@ -12,7 +12,7 @@ DataFrame::DataFrame()
 
 void DataFrame::addCol(const DataFrameCol& col)
 {	
-	cols.push_back(col);
+	cols.insert({ col.m_name, col });
 }
 
 void DataFrame::addRowVctr(const vector<string>& rowVctr) 
@@ -22,51 +22,51 @@ void DataFrame::addRowVctr(const vector<string>& rowVctr)
 
 DataFrame& DataFrame::apply(const string& query) {
 	DataFrame df;
+	string groupBy;
+	vector<string> selects;
 
 	// SELECT prijmeni, SUM(jmeno), MIN(key), MAX(key), MIN(vek), MAX(vek), SUM(deti), SUM(rodice), MIN(prumer), MAX(prumer) GROUP_BY prijmeni
-
+	
+	// Consts
 	const string SELECT = "SELECT";
 	const string GROUP_BY = "GROUP_BY";
 	const string MIN = "MIN";
 	const string MAX = "MAX";
 	const string SUM = "SUM";
 
-	string select;
-	string groupBy;
-	vector<string> aggs;
- 
+	// Process query
 	stringstream ss(query);
-	string prevWord;
 	string word;
-
 	int count = 0;
 	while (ss >> word) {
 		if (word == "") continue;
+		if (word == SELECT) continue;
 
 		if (word.back() == ',') {
 			word.pop_back();
 		}
 
-		if (word == SELECT) {
-			prevWord = SELECT;
-		}
-		else if (word == GROUP_BY) {
-			prevWord = GROUP_BY;
-		}
-		else if (prevWord == SELECT) {
-			select = word;
-			prevWord = "";
-		}
-		else if (prevWord == GROUP_BY) {
-			groupBy = word;
-			prevWord = "";
+		if (word == GROUP_BY) {
+			 ss >> groupBy;
 		}
 		else {
-			aggs.push_back(word);
+			selects.push_back(word);
 		}
 	}
-		
+	
+	// Groups
+	size_t groupByIndex = cols.at(groupBy).m_pos;
+	map<string, vector<vector<string>>> groups;
+	for (const vector<string>& row : rows) {
+		groups[row[groupByIndex]].push_back(row);
+	}
 
+	// Aggregate
+	for (const auto& group : groups) {
+		for (const string& select : selects) {
+
+		}
+	}
 	
 	return *this;
 }
@@ -77,7 +77,7 @@ void DataFrame::debugPrint() const
 	printf("\n");
 	for (const auto& col : cols)
 	{
-		string line = col.m_name + " " + to_string((int)(col.m_dataType)) + " " + to_string(col.m_pos) + "\n";
+		string line = col.second.m_name + " " + to_string((int)(col.second.m_dataType)) + " " + to_string(col.second.m_pos) + "\n";
 		printf(line.c_str());
 	}
 
