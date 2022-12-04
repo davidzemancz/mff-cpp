@@ -34,11 +34,11 @@ class AggCol
 {
 public:
 	string m_name;
-	const Col* m_origCol;
+	Col* m_origCol;
 	ColAggFun m_aggFun;
 
 	AggCol() {}
-	AggCol(const string& name, const Col* origCol, const ColAggFun aggFun) : m_name(name), m_origCol(origCol), m_aggFun(aggFun) {}
+	AggCol(const string& name, Col* origCol, const ColAggFun aggFun) : m_name(name), m_origCol(origCol), m_aggFun(aggFun) {}
 	virtual ~AggCol() {}
 };
 
@@ -131,10 +131,9 @@ void readData()
 	}
 
 	// Rows
-	string row;
+	string row = "";
 	for (size_t r = 0; r < rowsCount; r++) {
-		getline(cin, row);
-		if (row == "") { r--; continue; }
+		cin >> row;
 
 		vector<string_view> cells = splitString(row, D);
 
@@ -164,7 +163,7 @@ void readData()
 }
 
 void printAgg() {
-	string groupBy;
+	Col* groupByCol = nullptr;
 	vector<AggCol> aggCols;
 
 	// SELECT prijmeni, SUM(jmeno), MIN(key), MAX(key), MIN(vek), MAX(vek), SUM(deti), SUM(rodice), MIN(prumer), MAX(prumer) GROUP_BY prijmeni
@@ -180,7 +179,8 @@ void printAgg() {
 		}
 
 		if (word == "GROUP_BY") {
-			cin >> groupBy;
+			cin >> word;
+			groupByCol = getCol(word);
 		}
 		else {
 			ColAggFun aggFun = strToAggFun(string_view(word.c_str(), 3));
@@ -189,79 +189,102 @@ void printAgg() {
 		}
 	}
 
-	size_t b = 0;
-
-	// Groups
-	/*size_t groupByIndex = colsMap.at(groupBy).m_pos;
+	// Group
 	map<string, vector<size_t>> groups;
-	for (size_t r = 0; r < rows.size(); r++) {
-		groups[rows[r][groupByIndex]].push_back(r);
-	}*/
+	vector<string> groupsOrd;
+	if (groupByCol != nullptr) {
+		size_t counter = 0;
+		if (groupByCol->m_dataType == ColDataType::String) {
+			StringCol* sCol = dynamic_cast<StringCol*>(groupByCol);
+			for (string& val : sCol->vals) {
+				if (groups.count(val) == 0) groupsOrd.push_back(val);
+				groups[val].push_back(counter++);
+				
+			}
+		}
+		else if (groupByCol->m_dataType == ColDataType::Int) {
+			IntCol* sCol = dynamic_cast<IntCol*>(groupByCol);
+			for (int val : sCol->vals) {
+				string str = to_string(val);
+				if (groups.count(str) == 0) groupsOrd.push_back(str);
+				groups[str].push_back(counter++);
+			}
+		}
+		else if (groupByCol->m_dataType == ColDataType::Double) {
+			DoubleCol* sCol = dynamic_cast<DoubleCol*>(groupByCol);
+			for (double val : sCol->vals) {
+				string str = to_string(val);
+				if (groups.count(str) == 0) groupsOrd.push_back(str);
+				groups[str].push_back(counter++);
+			}
+		}
+	}
+	
+	// Print cols
+	size_t colCounter = 0;
+	for (const AggCol& col : aggCols) {
+		if (colCounter > 0) cout << ";";
+		cout << col.m_name;
+		colCounter++;
+	}
 
+	// Print rows
+	for (const string& groupKey : groupsOrd) {
+		vector<size_t> group = groups.at(groupKey);
+		cout << endl;
+		colCounter = 0;
+		for (const AggCol& col : aggCols) {
+			if (colCounter > 0) cout << ";";
 
-	//// Print cols
-	//size_t colCounter = 0;
-	//for (const string& select : selects) {
-	//	if (colCounter > 0) cout << ";";
-	//	cout << select;
-	//	colCounter++;
-	//}
-
-	//// Aggregate rows
-	//for (const auto& group : groups) {
-	//	colCounter = 0;
-	//	cout << endl;
-	//	for (const string& select : selects) {
-	//		Col col = aggCols.at(select);
-	//		size_t colIndex = cols.at(col.m_tag).m_pos;
-	//		ColDataType colDt = col.m_dataType;
-	//		size_t rowCounter = 0;
-	//		if (colDt == ColDataType::String) {
-	//			string value;
-	//			for (const size_t r : group.second) {
-	//				if (rowCounter == 0) value = rows[r][colIndex];
-	//				else if (col.m_aggFun == ColAggFun::Sum) value += rows[r][colIndex];
-	//				else value = rows[r][colIndex];
-	//				rowCounter++;
-	//			}
-
-	//			// Print
-	//			if (colCounter > 0) cout << ";";
-	//			cout << value;
-	//			colCounter++;
-	//		}
-	//		else if (colDt == ColDataType::Int) {
-	//			int value = 0;
-	//			for (const size_t r : group.second) {
-	//				if (rowCounter == 0) value = stoi(rows[r][colIndex]);
-	//				else if (col.m_aggFun == ColAggFun::Sum) value += stoi(rows[r][colIndex]);
-	//				else if (col.m_aggFun == ColAggFun::Min) value = min(stoi(rows[r][colIndex]), value);
-	//				else if (col.m_aggFun == ColAggFun::Max) value = max(stoi(rows[r][colIndex]), value);
-	//				rowCounter++;
-	//			}
-
-	//			// Print
-	//			if (colCounter > 0) cout << ";";
-	//			cout << to_string(value);
-	//			colCounter++;
-	//		}
-	//		else if (colDt == ColDataType::Double) {
-	//			double value = 0.0;
-	//			for (const size_t r : group.second) {
-	//				if (rowCounter == 0) value = stod(rows[r][colIndex]);
-	//				else if (col.m_aggFun == ColAggFun::Sum) value += stod(rows[r][colIndex]);
-	//				else if (col.m_aggFun == ColAggFun::Min) value = min(stod(rows[r][colIndex]), value);
-	//				else if (col.m_aggFun == ColAggFun::Max) value = max(stod(rows[r][colIndex]), value);
-	//				rowCounter++;
-	//			}
-
-	//			// Print
-	//			if (colCounter > 0) cout << ";";
-	//			cout << to_string(value);
-	//			colCounter++;
-	//		}
-	//	}
-	//}
+			if (col.m_origCol == groupByCol) {
+				cout << groupKey;
+			}
+			else if (col.m_origCol->m_dataType == ColDataType::String) {
+				StringCol* sCol = dynamic_cast<StringCol*>(col.m_origCol);
+				string_view val;
+				size_t rowCounter = 0;
+				for (size_t row : group) {
+					if (rowCounter == 0) val = sCol->vals[row];
+					if (col.m_aggFun == ColAggFun::Sum) cout << sCol->vals[row];
+					else if (col.m_aggFun == ColAggFun::Min) val = sCol->vals[row] < val ? sCol->vals[row] : val;
+					else if (col.m_aggFun == ColAggFun::Max) val = sCol->vals[row] > val ? sCol->vals[row] : val;
+					else val = sCol->vals[row];
+					rowCounter++;
+				}
+				if (col.m_aggFun != ColAggFun::Sum) cout << val;
+			}
+			else if(col.m_origCol->m_dataType == ColDataType::Int) {
+				IntCol* sCol = dynamic_cast<IntCol*>(col.m_origCol);
+				int val = 0;
+				size_t rowCounter = 0;
+				for (size_t row : group) {
+					if (rowCounter == 0) val = sCol->vals[row];
+					else if (col.m_aggFun == ColAggFun::Sum) val += sCol->vals[row];
+					else if (col.m_aggFun == ColAggFun::Min) val = min(val, sCol->vals[row]);
+					else if (col.m_aggFun == ColAggFun::Max) val = max(val, sCol->vals[row]);
+					else val = sCol->vals[row];
+					rowCounter++;
+				}
+				cout << to_string(val);
+			}
+			else if (col.m_origCol->m_dataType == ColDataType::Double) {
+				DoubleCol* sCol = dynamic_cast<DoubleCol*>(col.m_origCol);
+				double val = 0;
+				size_t rowCounter = 0;
+				for (size_t row : group) {
+					if (rowCounter == 0) val = sCol->vals[row];
+					else if (col.m_aggFun == ColAggFun::Sum) val += sCol->vals[row];
+					else if (col.m_aggFun == ColAggFun::Min) val = min(val, sCol->vals[row]);
+					else if (col.m_aggFun == ColAggFun::Max) val = max(val, sCol->vals[row]);
+					else val = sCol->vals[row];
+					rowCounter++;
+				}
+				cout << to_string(val);
+			}
+			
+			colCounter++;
+		}
+	}
 }
 
 int mainRecodex() {

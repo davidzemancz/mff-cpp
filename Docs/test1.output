@@ -1,0 +1,4 @@
+prijmeni;jmeno;MIN(prijmeni);MIN(key);MAX(key);MIN(vek);MAX(vek);SUM(deti);SUM(rodice);MIN(prumer);MAX(prumer)
+zzz;c;xxx;1.000000;3.000000;10;13;2;4;-2.200000;-0.500000
+zzz;b;xxx;2.000000;6.000000;56;99;3;32;-1.200000;9.900000
+xxx;d;xxx;4.000000;4.000000;23;23;1;6;3.100000;3.100000

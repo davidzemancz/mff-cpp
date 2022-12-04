@@ -7,4 +7,4 @@ double;string;string;int;int;int;double;double
 4;d;xxx;23;1;6;1.41;3.1
 5;a;xxx;76;3;10;8.833;5.2
 6;b;zzz;99;3;22;2.44443;9.9
-SELECT prijmeni, SUM(jmeno), MIN(key), MAX(key), MIN(vek), MAX(vek), SUM(deti), SUM(rodice), MIN(prumer), MAX(prumer) GROUP_BY prijmeni
+SELECT prijmeni, jmeno, MIN(prijmeni), MIN(key), MAX(key), MIN(vek), MAX(vek), SUM(deti), SUM(rodice), MIN(prumer), MAX(prumer) GROUP_BY deti
