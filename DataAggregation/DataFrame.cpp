@@ -86,7 +86,7 @@ DataFrame DataFrame::apply(const string& query) {
 				aggRow.push_back(value);
 			}
 			else if (colDt == ColDataType::Int) {
-				int value; 
+				int value = 0; 
 				for (const vector<string>& row : group.second) {
 					if (counter == 0) value = stoi(row[colIndex]);
 					else if (col.m_aggFun == ColAggFun::Sum) value += stoi(row[colIndex]);
@@ -97,7 +97,7 @@ DataFrame DataFrame::apply(const string& query) {
 				aggRow.push_back(to_string(value));
 			}
 			else if (colDt == ColDataType::Double) {
-				double value;
+				double value = 0.0;
 				for (const vector<string>& row : group.second) {
 					if (counter == 0) value = stod(row[colIndex]);
 					else if (col.m_aggFun == ColAggFun::Sum) value += stod(row[colIndex]);

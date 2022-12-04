@@ -24,7 +24,7 @@ DataFrame readData(string& query)
 
 	vector<string> colNames = strSplit(colNamesStr, D);
 	vector<string> colTypes = strSplit(colTypesStr, D);
-	for (int i = 0; i < colNames.size(); i++) {
+	for (size_t i = 0; i < colNames.size(); i++) {
 
 		ColDataType colDt = StrToDataType(colTypes[i]);
 		df.addCol(DataFrameCol(i, colNames[i], colDt));
@@ -79,25 +79,38 @@ void writeData(const DataFrame& df) {
 	delete[] cols;
 }
 
-int main()
+int mainRecodex() {
+	string query;
+	DataFrame df = readData(query);
+	writeData(df.apply(query));
+
+	return 0;
+}
+
+int mainLocal()
 {
-	//const string inFile = "C:\\Users\\david\\OneDrive\\MFFUK\\3-1\\C++\\mff-cpp\\Docs\\test.input";
-	//const string outFile = "C:\\Users\\david\\OneDrive\\MFFUK\\3-1\\C++\\mff-cpp\\Docs\\test1.output";
+	const string inFile = "C:\\Users\\david\\OneDrive\\MFFUK\\3-1\\C++\\mff-cpp\\Docs\\test.input";
+	const string outFile = "C:\\Users\\david\\OneDrive\\MFFUK\\3-1\\C++\\mff-cpp\\Docs\\test1.output";
 
-	//ifstream in(inFile);
-	//streambuf* cinbuf = cin.rdbuf(); //save old buf
-	//cin.rdbuf(in.rdbuf()); //redirect cin to in.txt!
+	ifstream in(inFile);
+	streambuf* cinbuf = cin.rdbuf(); //save old buf
+	cin.rdbuf(in.rdbuf()); //redirect cin to in.txt!
 
-	//ofstream out(outFile);
-	//streambuf* coutbuf = cout.rdbuf(); //save old buf
-	//cout.rdbuf(out.rdbuf()); //redirect cout to out.txt!
+	ofstream out(outFile);
+	streambuf* coutbuf = cout.rdbuf(); //save old buf
+	cout.rdbuf(out.rdbuf()); //redirect cout to out.txt!
 
 	string query;
 	DataFrame df = readData(query);
 	writeData(df.apply(query));
 
-	//cin.rdbuf(cinbuf);   //reset to standard input again
-	//cout.rdbuf(coutbuf); //reset to standard output agai
+	cin.rdbuf(cinbuf);   //reset to standard input again
+	cout.rdbuf(coutbuf); //reset to standard output agai
 
 	return 0;
+}
+
+int main()
+{
+	return mainLocal();
 }

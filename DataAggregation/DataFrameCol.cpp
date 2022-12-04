@@ -1,5 +1,6 @@
 #include "DataFrameCol.h"
 #include <string>
+#include <cstring>
 
 using namespace std;
 
