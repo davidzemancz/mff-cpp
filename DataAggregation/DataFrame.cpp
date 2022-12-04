@@ -25,7 +25,7 @@ void DataFrame::addRowVctr(const vector<string>& rowVctr)
 	rows.push_back(rowVctr);
 }
 
-DataFrame DataFrame::apply(const string& query) {
+void DataFrame::printAgg(const string& query) {
 	DataFrame df;
 	string groupBy;
 	vector<string> selects;
@@ -62,77 +62,77 @@ DataFrame DataFrame::apply(const string& query) {
 	
 	// Groups
 	size_t groupByIndex = cols.at(groupBy).m_pos;
-	map<string, vector<vector<string>>> groups;
-	for (const vector<string>& row : rows) {
-		groups[row[groupByIndex]].push_back(row);
+	map<string, vector<size_t>> groups;
+	for (size_t r = 0; r < rows.size(); r++) {
+		groups[rows[r][groupByIndex]].push_back(r);
+	}
+	
+
+	// Print cols
+	size_t colCounter = 0;
+	for (const string& select : selects) {
+		DataFrameCol col = df.cols.at(select);
+		if (colCounter > 0) cout << ";";
+		cout << col.m_name;
+		colCounter++;
 	}
 
-	// Aggregate
+	// Aggregate rows
 	for (const auto& group : groups) {
-		vector<string> aggRow;
+		colCounter = 0;
+		cout << endl;
 		for (const string& select : selects) {
 			DataFrameCol col = df.cols.at(select);
 			size_t colIndex = cols.at(col.m_tag).m_pos;
 			ColDataType colDt = col.m_dataType;
-			size_t counter = 0;
+			size_t rowCounter = 0;
 			if (colDt == ColDataType::String) {
 				string value;
-				for (const vector<string>& row : group.second) {
-					if (counter == 0) value = row[colIndex];
-					else if (col.m_aggFun == ColAggFun::Sum) value += row[colIndex];
-					else value = row[colIndex];
-					counter++;
+				for (const size_t r : group.second) {
+					if (rowCounter == 0) value = rows[r][colIndex];
+					else if (col.m_aggFun == ColAggFun::Sum) value += rows[r][colIndex];
+					else value = rows[r][colIndex];
+					rowCounter++;
 				}
-				aggRow.push_back(value);
+
+				// Print
+				if (colCounter > 0) cout << ";";
+				cout << value;
+				colCounter++;
 			}
 			else if (colDt == ColDataType::Int) {
 				int value = 0; 
-				for (const vector<string>& row : group.second) {
-					if (counter == 0) value = stoi(row[colIndex]);
-					else if (col.m_aggFun == ColAggFun::Sum) value += stoi(row[colIndex]);
-					else if (col.m_aggFun == ColAggFun::Min) value = min(stoi(row[colIndex]), value);
-					else if (col.m_aggFun == ColAggFun::Max) value = max(stoi(row[colIndex]), value);
-					counter++;
+				for (const size_t r : group.second) {
+					if (rowCounter == 0) value = stoi(rows[r][colIndex]);
+					else if (col.m_aggFun == ColAggFun::Sum) value += stoi(rows[r][colIndex]);
+					else if (col.m_aggFun == ColAggFun::Min) value = min(stoi(rows[r][colIndex]), value);
+					else if (col.m_aggFun == ColAggFun::Max) value = max(stoi(rows[r][colIndex]), value);
+					rowCounter++;
 				}
-				aggRow.push_back(to_string(value));
+				
+				// Print
+				if (colCounter > 0) cout << ";";
+				cout << to_string(value);
+				colCounter++;
 			}
 			else if (colDt == ColDataType::Double) {
 				double value = 0.0;
-				for (const vector<string>& row : group.second) {
-					if (counter == 0) value = stod(row[colIndex]);
-					else if (col.m_aggFun == ColAggFun::Sum) value += stod(row[colIndex]);
-					else if (col.m_aggFun == ColAggFun::Min) value = min(stod(row[colIndex]), value);
-					else if (col.m_aggFun == ColAggFun::Max) value = max(stod(row[colIndex]), value);
-					counter++;
+				for (const size_t r : group.second) {
+					if (rowCounter == 0) value = stod(rows[r][colIndex]);
+					else if (col.m_aggFun == ColAggFun::Sum) value += stod(rows[r][colIndex]);
+					else if (col.m_aggFun == ColAggFun::Min) value = min(stod(rows[r][colIndex]), value);
+					else if (col.m_aggFun == ColAggFun::Max) value = max(stod(rows[r][colIndex]), value);
+					rowCounter++;
 				}
-				aggRow.push_back(to_string(value));
+				
+				// Print
+				if (colCounter > 0) cout << ";";
+				cout << to_string(value);
+				colCounter++;
 			}
 		}
-		df.addRowVctr(aggRow);
-	}
-	
-	return df;
-}
-
-void DataFrame::debugPrint() const
-{
-	printf("----- Cols -----");
-	printf("\n");
-	for (const auto& col : cols)
-	{
-		string line = col.second.m_name + " " + to_string((int)(col.second.m_dataType)) + " " + to_string(col.second.m_pos) + "\n";
-		printf(line.c_str());
-	}
-
-	printf("----- Rows -----");
-	for (const auto& row : rows)
-	{
-		for (const string& elem : row) {
-			printf(elem.c_str());
-			printf(";");
-		}
-		printf("\n");
 	}
 }
+
 
 

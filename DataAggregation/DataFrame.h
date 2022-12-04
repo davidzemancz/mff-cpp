@@ -17,6 +17,5 @@ public:
 	void addCol(const DataFrameCol& col);
 	void updateColDataType(const string& name, const ColDataType dataType);
 	void addRowVctr(const vector<string>& rowVctr);
-	DataFrame apply(const string& query);
-	void debugPrint() const;
+	void printAgg(const string& query);
 };
