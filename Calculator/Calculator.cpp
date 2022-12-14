@@ -1,22 +1,85 @@
-// Calculator.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
-// https://fan1x.github.io/cpp22.html
-
 #include <iostream>
 
-int main()
+using namespace std;
+
+const char* expressionToParse = "-3*2+4*1+(4+9)*6";
+
+char peek()
 {
-    std::cout << "Hello World!\n";
+	return *expressionToParse;
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
+char get() {
+	return *expressionToParse++;
+}
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+int expression();
+
+
+int number() {
+	int result = get() - '0';
+	while (peek() >= '0' && peek() <= '9')
+	{
+		result = 10 * result + get() - '0';
+	}
+	return result;
+}
+
+int var() {
+
+}
+
+bool isnumber() {
+	return peek() >= '0' && peek() <= '9';
+}
+
+bool isvar() {
+	return false;
+}
+
+int factor() {
+	if (isnumber())
+		return number();
+	else if (isvar())
+		return var();
+	else if (peek() == '(')
+	{
+		get(); // '('
+		int result = expression();
+		get(); // ')'
+		return result;
+	}
+	else if (peek() == '-')
+	{
+		get();
+		return -factor();
+	}
+	return 0; // error
+}
+
+int term() {
+	int result = factor();
+	while (peek() == '*' || peek() == '/')
+		if (get() == '*')
+			result *= factor();
+		else
+			result /= factor();
+	return result;
+}
+
+int expression() {
+	int result = term();
+	while (peek() == '+' || peek() == '-')
+		if (get() == '+')
+			result += term();
+		else
+			result -= term();
+	return result;
+}
+
+int main(int argc, char* argv[])
+{
+	int result = expression();
+	cout << result;
+	return 0;
+}
