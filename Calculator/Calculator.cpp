@@ -1,85 +1,65 @@
 #include <iostream>
+#include <string>
+#include "Storage.h"
+#include "Expr.h"
+#include <stack>
 
 using namespace std;
 
-const char* expressionToParse = "-3*2+4*1+(4+9)*6";
-
-char peek()
-{
-	return *expressionToParse;
+void printExprVal(const Storage& storage, const TypeEnum& exprType, const string& exprName) {
+	switch (exprType) {
+	case TypeEnum::Int:
+		cout << storage.GetInt(exprName);
+		break;
+	case TypeEnum::Float:
+		cout << storage.GetFloat(exprName);
+		break;
+	case TypeEnum::Double:
+		cout << storage.GetDouble(exprName);
+		break;
+	};
 }
 
-char get() {
-	return *expressionToParse++;
-}
-
-int expression();
-
-
-int number() {
-	int result = get() - '0';
-	while (peek() >= '0' && peek() <= '9')
+void evalExprs(const Storage& storage) {
+	string strExpr;
+	while (cin >> strExpr && strExpr != "")
 	{
-		result = 10 * result + get() - '0';
+		TypeEnum exprType;
+		string exprName;
+		Expr(strExpr).Evaluate(storage, exprType, exprName);
+		printExprVal(storage, exprType, exprName);
 	}
-	return result;
 }
 
-int var() {
+class ExprVal {
+public:
+	virtual ExprVal& Plus(const ExprVal& expr) = 0;
+};
 
-}
+class ExprValInt : public ExprVal {
 
-bool isnumber() {
-	return peek() >= '0' && peek() <= '9';
-}
+public:
+	int val;
 
-bool isvar() {
-	return false;
-}
+	ExprValInt(int val) : val(val) {};
 
-int factor() {
-	if (isnumber())
-		return number();
-	else if (isvar())
-		return var();
-	else if (peek() == '(')
-	{
-		get(); // '('
-		int result = expression();
-		get(); // ')'
-		return result;
+	ExprVal& Plus(const ExprVal& expr) {
+		return *this;
 	}
-	else if (peek() == '-')
-	{
-		get();
-		return -factor();
-	}
-	return 0; // error
-}
+};
 
-int term() {
-	int result = factor();
-	while (peek() == '*' || peek() == '/')
-		if (get() == '*')
-			result *= factor();
-		else
-			result /= factor();
-	return result;
-}
+int main(int argc, char* argv[]) {
+	
+	ExprValInt e(5);
+	stack<ExprVal*> st;
+	st.push(&e);
+	ExprValInt* ie = dynamic_cast<ExprValInt*>(st.top());
+	cout << ie->val;
+	
+	return 0;
 
-int expression() {
-	int result = term();
-	while (peek() == '+' || peek() == '-')
-		if (get() == '+')
-			result += term();
-		else
-			result -= term();
-	return result;
-}
+	Storage storage;
+	evalExprs(storage);
 
-int main(int argc, char* argv[])
-{
-	int result = expression();
-	cout << result;
 	return 0;
 }
