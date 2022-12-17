@@ -1,36 +1,17 @@
 #include "Storage.h"
 
-TypeEnum Storage::GetType(const string& name) const
+void Storage::SetVal(const string& name, const ExprVal* exprVal)
 {
-    return types.at(name);
+	vals[name] = exprVal;
 }
 
- int  Storage::GetInt(const string& name) const
+const ExprVal* Storage::GetVal(const string& name) const
 {
-     return intVals.at(name);
+	return vals.at(name);
 }
 
- void Storage::SetInt(const string& name, const int value)
- {
-     intVals[name] = value;
- }
-
-float Storage::GetFloat(const string& name) const
+const ExprVal* Storage::GetVal(const string_view& name) const
 {
-    return floatVals.at(name);
+	return vals.at(string(name));
 }
 
-void Storage::SetFloat(const string& name, const float value)
-{
-    floatVals[name] = value;
-}
-
-double Storage::GetDouble(const string& name) const
-{
-    return doubleVals.at(name);
-}
-
-void Storage::SetDouble(const string& name, const double value)
-{
-    doubleVals[name] = value;
-}

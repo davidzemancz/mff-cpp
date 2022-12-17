@@ -1,8 +1,10 @@
 #include "Expr.h"
 #include <stack>
+#include "ExprVal.h"
 //#include <bits/stdc++.h>
 
 using namespace std;
+
 
 // Function to find precedence of
 // operators.
@@ -15,24 +17,23 @@ int precedence(char op) {
 }
 
 // Function to perform arithmetic operations.
-int applyOp(int a, int b, char op) {
+ExprVal* applyOp(const ExprVal* a, const ExprVal* b, char op) {
     switch (op) {
-    case '+': return a + b;
-    case '-': return a - b;
-    case '*': return a * b;
-    case '/': return a / b;
+    case '+': return a->Plus(b);
+    case '-': return a->Minus(b);
+    case '*': return a->MultiplyBy(b);
+    case '/': return a->DivideBy(b);
     }
+    return nullptr;
 }
-
-
 
 // Function that returns value of
 // expression after evaluation.
-int evaluate(string tokens) {
-    int i;
+const ExprVal* Expr::evaluate(const string_view& tokens) const {
+    size_t i;
 
     // stack to store integer values.
-    stack <int> values;
+    stack <const ExprVal*> values;
 
     // stack to store operators.
     stack <char> ops;
@@ -64,7 +65,7 @@ int evaluate(string tokens) {
                 i++;
             }
 
-            values.push(val);
+            values.push(new ExprValInt(val));
 
             // right now the i points to
             // the character next to the digit,
@@ -76,22 +77,37 @@ int evaluate(string tokens) {
             i--;
         }
 
+        // Current token is dolar sing, 
+        //  read variables value from storage
+        else if (tokens[i] == '$') {
+            i++;
+            size_t j = i;
+            while (i < tokens.size() && isalpha(tokens[i])) { i++; }
+            
+            string_view key = tokens.substr(j, i-j);
+            const ExprVal* v = storage.GetVal(key);
+            values.push(v);
+            i--;
+        }
+
         // Closing brace encountered, solve
         // entire brace.
         else if (tokens[i] == ')')
         {
             while (!ops.empty() && ops.top() != '(')
             {
-                int val2 = values.top();
+                const ExprVal* val2 = values.top();
                 values.pop();
 
-                int val1 = values.top();
+                const ExprVal* val1 = values.top();
                 values.pop();
 
                 char op = ops.top();
                 ops.pop();
 
                 values.push(applyOp(val1, val2, op));
+
+                //delete val1, val2;
             }
 
             // pop opening brace.
@@ -108,16 +124,18 @@ int evaluate(string tokens) {
             // of 'ops' to top two elements in values stack.
             while (!ops.empty() && precedence(ops.top())
                 >= precedence(tokens[i])) {
-                int val2 = values.top();
+                const ExprVal* val2 = values.top();
                 values.pop();
 
-                int val1 = values.top();
+                const ExprVal* val1 = values.top();
                 values.pop();
 
                 char op = ops.top();
                 ops.pop();
 
                 values.push(applyOp(val1, val2, op));
+
+                //delete val1, val2;
             }
 
             // Push current token to 'ops'.
@@ -129,16 +147,18 @@ int evaluate(string tokens) {
     // point, apply remaining ops to remaining
     // values.
     while (!ops.empty()) {
-        int val2 = values.top();
+        const ExprVal* val2 = values.top();
         values.pop();
 
-        int val1 = values.top();
+        const ExprVal* val1 = values.top();
         values.pop();
 
         char op = ops.top();
         ops.pop();
 
         values.push(applyOp(val1, val2, op));
+
+        //delete val1, val2;
     }
 
     // Top of 'values' contains result, return it.
@@ -146,11 +166,21 @@ int evaluate(string tokens) {
 }
 
 
-Expr::Expr(string& strExpr) : str(strExpr) {}
+Expr::Expr(const string& strExpr, Storage& storage) : str(strExpr), storage(storage) {}
 
-int Expr::Evaluate(const Storage& storage, TypeEnum& exprType, string& exprName)
+const ExprVal* Expr::Evaluate() const
 {
-	exprType = TypeEnum::Int;
-	exprName = "cus";
-	return 0;
+    size_t i = 0;
+    while (isalpha(str[i++])) { /* pass */ }
+    bool isAssignment = str[i-1] == '=';
+    
+    string_view strView(str.c_str());
+    if (isAssignment) {
+        const ExprVal* res = evaluate(strView.substr(i));
+        storage.SetVal(string(strView.substr(0, i-1)), res);
+        return res;
+    }
+    else {
+        return evaluate(strView);
+    }
 }

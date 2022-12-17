@@ -3,11 +3,13 @@
 class Expr
 {
 private:
-
+	const ExprVal* evaluate(const string_view& tokens) const ;
 
 public:
-	string& str;
-	Expr(string& strExpr);
-	int Evaluate(const Storage& storage, TypeEnum& exprType, string& exprName);
+	const string& str;
+	Storage& storage;
+
+	Expr(const string& strExpr, Storage& storage);
+	const ExprVal* Evaluate() const;
 };
 
