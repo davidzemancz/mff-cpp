@@ -50,7 +50,7 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
         else if (tokens[i] == '(') {
             ops.push(tokens[i]);
         }
-        else if (isdigit(tokens[i])) {
+        else if (isdigit(tokens[i])) {  
             int whole = 0;
             int decimal = 0;
             bool dotFound = false;
