@@ -13,6 +13,8 @@ int precedence(char op) {
         return 1;
     if (op == '*' || op == '/')
         return 2;
+    if (op == '%')
+        return 3;
     return 0;
 }
 
@@ -23,6 +25,7 @@ ExprVal* applyOp(const ExprVal* a, const ExprVal* b, char op) {
     case '-': return a->Minus(b);
     case '*': return a->MultiplyBy(b);
     case '/': return a->DivideBy(b);
+    case '%': return a->Mod(b);
     }
     return nullptr;
 }
@@ -40,45 +43,62 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
 
     for (i = 0; i < tokens.length(); i++) {
 
-        // Current token is a whitespace,
-        // skip it.
-        if (tokens[i] == ' ')
+        // Skip spaces
+        if (tokens[i] == ' ') {
             continue;
-
-        // Current token is an opening
-        // brace, push it to 'ops'
+        }
         else if (tokens[i] == '(') {
             ops.push(tokens[i]);
         }
-
-        // Current token is a number, push
-        // it to stack for numbers.
         else if (isdigit(tokens[i])) {
-            int val = 0;
+            int whole = 0;
+            int decimal = 0;
+            bool dotFound = false;
 
-            // There may be more than one
-            // digits in number.
-            while (i < tokens.length() &&
-                isdigit(tokens[i]))
+            // Read number
+            while (i < tokens.length() && (isdigit(tokens[i]) || tokens[i] == '.'))
             {
-                val = (val * 10) + (tokens[i] - '0');
+                if (tokens[i] == '.') {
+                    dotFound = true;
+                }
+                else if (!dotFound) {
+                    whole = (whole * 10) + (tokens[i] - '0');
+                }
+                else {
+                    decimal = (decimal * 10) + (tokens[i] - '0');
+                }
                 i++;
             }
 
-            values.push(new ExprValInt(val));
-
-            // right now the i points to
-            // the character next to the digit,
-            // since the for loop also increases
-            // the i, we would skip one
-            //  token position; we need to
-            // decrease the value of i by 1 to
-            // correct the offset.
+            // Decimal number
+            if (dotFound) {
+                // Float
+                if (i < tokens.length() && tokens[i] == 'f') {
+                    float val = decimal;
+                    while (val > 1) {
+                        val /= 10;
+                    }
+                    val += whole;
+                    values.push(new ExprValFloat(val));
+                    i++;
+                }
+                // Double
+                else {
+                    double val = decimal;
+                    while (val > 1) {
+                        val /= 10;
+                    }
+                    val += whole;
+                    values.push(new ExprValDouble(val));
+                }
+            }
+            // Whole number
+            else {
+                values.push(new ExprValInt(whole));
+            }
             i--;
         }
-
-        // Current token is dolar sing, 
-        //  read variables value from storage
+        // Variable
         else if (tokens[i] == '$') {
             i++;
             size_t j = i;
@@ -89,9 +109,6 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
             values.push(v);
             i--;
         }
-
-        // Closing brace encountered, solve
-        // entire brace.
         else if (tokens[i] == ')')
         {
             while (!ops.empty() && ops.top() != '(')
@@ -105,23 +122,17 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
                 char op = ops.top();
                 ops.pop();
 
-                values.push(applyOp(val1, val2, op));
-
-                //delete val1, val2;
+                ExprVal* opRes = applyOp(val1, val2, op);
+                if (opRes == nullptr) return nullptr;
             }
 
-            // pop opening brace.
+            // Pop opening brace.
             if (!ops.empty())
                 ops.pop();
         }
-
-        // Current token is an operator.
+        // Operator
         else
         {
-            // While top of 'ops' has same or greater
-            // precedence to current token, which
-            // is an operator. Apply operator on top
-            // of 'ops' to top two elements in values stack.
             while (!ops.empty() && precedence(ops.top())
                 >= precedence(tokens[i])) {
                 const ExprVal* val2 = values.top();
@@ -133,19 +144,16 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
                 char op = ops.top();
                 ops.pop();
 
-                values.push(applyOp(val1, val2, op));
-
-                //delete val1, val2;
+                ExprVal* opRes = applyOp(val1, val2, op);
+                if (opRes == nullptr) return nullptr;
+                values.push(opRes);
             }
 
-            // Push current token to 'ops'.
             ops.push(tokens[i]);
         }
     }
-
-    // Entire expression has been parsed at this
-    // point, apply remaining ops to remaining
-    // values.
+    
+    // Rest
     while (!ops.empty()) {
         const ExprVal* val2 = values.top();
         values.pop();
@@ -156,13 +164,13 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
         char op = ops.top();
         ops.pop();
 
-        values.push(applyOp(val1, val2, op));
-
-        //delete val1, val2;
+        ExprVal* opRes = applyOp(val1, val2, op);
+        if (opRes == nullptr) return nullptr;
+        values.push(opRes);
     }
 
-    // Top of 'values' contains result, return it.
-    return values.top();
+    // Return result
+    return values.size() == 1 ? values.top() : nullptr; 
 }
 
 

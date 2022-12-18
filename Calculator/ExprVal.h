@@ -1,12 +1,17 @@
 #pragma once
 #include <iostream>
+#include <string>
 
 class ExprVal {
+
 public:
+    const static std::string INVALID;
+
     virtual ExprVal* Plus(const ExprVal* expr) const = 0;
     virtual ExprVal* Minus(const ExprVal* expr) const = 0;
     virtual ExprVal* DivideBy(const ExprVal* expr) const = 0;
     virtual ExprVal* MultiplyBy(const ExprVal* expr) const = 0;
+    virtual ExprVal* Mod(const ExprVal* expr) const = 0;
 };
 
 std::ostream& operator << (std::ostream& stream, const ExprVal& exprVal);
@@ -21,6 +26,7 @@ public:
     ExprVal* Minus(const ExprVal* expr) const;
     ExprVal* DivideBy(const ExprVal* expr) const;
     ExprVal* MultiplyBy(const ExprVal* expr) const;
+    ExprVal* Mod(const ExprVal* expr) const;
 };
 
 std::ostream& operator << (std::ostream& stream, const ExprValInt& exprVal);
@@ -35,6 +41,7 @@ public:
     ExprVal* Minus(const ExprVal* expr) const;
     ExprVal* DivideBy(const ExprVal* expr) const;
     ExprVal* MultiplyBy(const ExprVal* expr) const;
+    ExprVal* Mod(const ExprVal* expr) const;
 };
 
 std::ostream& operator << (std::ostream& stream, const ExprValFloat& exprVal);
@@ -49,6 +56,7 @@ public:
     ExprVal* Minus(const ExprVal* expr) const;
     ExprVal* DivideBy(const ExprVal* expr) const;
     ExprVal* MultiplyBy(const ExprVal* expr) const;
+    ExprVal* Mod(const ExprVal* expr) const;
 };
 
 std::ostream& operator << (std::ostream& stream, const ExprValDouble& exprVal);

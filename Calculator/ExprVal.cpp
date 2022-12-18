@@ -2,6 +2,7 @@
 #include <ostream>
 #include <iostream>
 
+const std::string ExprVal::INVALID = "invalid";
 
 std::ostream& operator<< (std::ostream& stream, const ExprVal& expr) {
     const ExprValInt* exprInt = dynamic_cast<const ExprValInt*>(&expr);
@@ -72,6 +73,14 @@ ExprVal* ExprValInt::MultiplyBy(const ExprVal* expr) const
     return nullptr;
 }
 
+ExprVal* ExprValInt::Mod(const ExprVal* expr) const
+{
+    const ExprValInt* exprInt = dynamic_cast<const ExprValInt*>(expr);
+    if (exprInt != nullptr) return new ExprValInt(val % exprInt->val);
+
+    return nullptr;
+}
+
 std::ostream& operator<< (std::ostream& stream, const ExprValInt& expr) {
     return std::cout << expr.val;
 }
@@ -131,6 +140,11 @@ ExprVal* ExprValFloat::MultiplyBy(const ExprVal* expr) const
     const ExprValDouble* exprDouble = dynamic_cast<const ExprValDouble*>(expr);
     if (exprDouble != nullptr) return new ExprValDouble(val * exprDouble->val);
 
+    return nullptr;
+}
+
+ExprVal* ExprValFloat::Mod(const ExprVal* expr) const
+{
     return nullptr;
 }
 
@@ -194,6 +208,11 @@ ExprVal* ExprValDouble::MultiplyBy(const ExprVal* expr) const
     const ExprValDouble* exprDouble = dynamic_cast<const ExprValDouble*>(expr);
     if (exprDouble != nullptr) return new ExprValDouble(val * exprDouble->val);
 
+    return nullptr;
+}
+
+ExprVal* ExprValDouble::Mod(const ExprVal* expr) const
+{
     return nullptr;
 }
 

@@ -152,6 +152,9 @@
     <ClInclude Include="ExprVal.h" />
     <ClInclude Include="Storage.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Test1.in" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
