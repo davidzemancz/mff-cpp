@@ -18,7 +18,7 @@ int run() {
 	Storage storage;
 
 	string strExpr;
-	while (cin >> strExpr && strExpr != "")
+	while (getline(cin, strExpr) && strExpr != "")
 	{
 		string exprName;
 		const ExprVal* res = Expr(strExpr, storage).Evaluate();
@@ -49,6 +49,32 @@ int runTest(fs::path& path) {
 	return 0;
 }
 
+
+bool filesAreSame(fs::path& path) {
+	path.replace_extension(fs::path(".out"));
+	const string p1 = path.string();
+	path.replace_extension(fs::path(".res"));
+	const string p2 = path.string();
+
+	std::ifstream f1(p1, std::ifstream::binary | std::ifstream::ate);
+	std::ifstream f2(p2, std::ifstream::binary | std::ifstream::ate);
+
+	if (f1.fail() || f2.fail()) {
+		return false; //file problem
+	}
+
+	if (f1.tellg() != f2.tellg()) {
+		return false; //size mismatch
+	}
+
+	//seek back to beginning and use std::equal to compare contents
+	f1.seekg(0, std::ifstream::beg);
+	f2.seekg(0, std::ifstream::beg);
+	return std::equal(std::istreambuf_iterator<char>(f1.rdbuf()),
+		std::istreambuf_iterator<char>(),
+		std::istreambuf_iterator<char>(f2.rdbuf()));
+}
+
 int runTests()
 {
 	const string testDir = "C:\\Users\\david\\OneDrive\\MFFUK\\3-1\\C++\\mff-cpp\\Calculator";
@@ -58,12 +84,13 @@ int runTests()
 		auto path = entry.path();
 		auto fn = path.filename();
 		if (fn.extension() == ".in" && fn.string().substr(0, 4) == "Test") {
-			std::cout << "Running test on " << fn << std::endl;
 			runTest(path);
-			std::cout << "Test " << fn << " completed" << std::endl;
+			if (filesAreSame(path))
+				std::cout << fn << " OK" << std::endl;
+			else
+				std::cout << fn << " failed" << std::endl;
 		}
 	}
-
 
 	return 0;
 }
@@ -71,7 +98,7 @@ int runTests()
 
 int main(int argc, char* argv[]) {
 
-	run();
+	//run();
 	runTests();
 
 	return 0;

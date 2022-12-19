@@ -41,132 +41,146 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
     // stack to store operators.
     stack <char> ops;
 
-    for (i = 0; i < tokens.length(); i++) {
+    try {
+        for (i = 0; i < tokens.length(); i++) {
 
-        // Skip spaces
-        if (tokens[i] == ' ') {
-            continue;
-        }
-        else if (tokens[i] == '(') {
-            ops.push(tokens[i]);
-        }
-        else if (isdigit(tokens[i])) {  
-            int whole = 0;
-            int decimal = 0;
-            bool dotFound = false;
-
-            // Read number
-            while (i < tokens.length() && (isdigit(tokens[i]) || tokens[i] == '.'))
-            {
-                if (tokens[i] == '.') {
-                    dotFound = true;
-                }
-                else if (!dotFound) {
-                    whole = (whole * 10) + (tokens[i] - '0');
-                }
-                else {
-                    decimal = (decimal * 10) + (tokens[i] - '0');
-                }
-                i++;
+            // Skip spaces
+            if (tokens[i] == ' ') {
+                continue;
             }
+            else if (tokens[i] == '(') {
+                ops.push(tokens[i]);
+            }
+            else if (isdigit(tokens[i])) {
+                int whole = 0;
+                int decimal = 0;
+                bool dotFound = false;
 
-            // Decimal number
-            if (dotFound) {
-                // Float
-                if (i < tokens.length() && tokens[i] == 'f') {
-                    float val = decimal;
-                    while (val > 1) {
-                        val /= 10;
+                // Read number
+                while (i < tokens.length() && (isdigit(tokens[i]) || tokens[i] == '.'))
+                {
+                    if (tokens[i] == '.') {
+                        dotFound = true;
                     }
-                    val += whole;
-                    values.push(new ExprValFloat(val));
+                    else if (!dotFound) {
+                        whole = (whole * 10) + (tokens[i] - '0');
+                    }
+                    else {
+                        decimal = (decimal * 10) + (tokens[i] - '0');
+                    }
                     i++;
                 }
-                // Double
-                else {
-                    double val = decimal;
-                    while (val > 1) {
-                        val /= 10;
+
+                // Decimal number
+                if (dotFound) {
+                    // Float
+                    if (i < tokens.length() && tokens[i] == 'f') {
+                        float val = decimal;
+                        while (val >= 1) {
+                            val /= 10;
+                        }
+                        val += whole;
+                        values.push(new ExprValFloat(val));
+                        i++;
                     }
-                    val += whole;
-                    values.push(new ExprValDouble(val));
+                    // Double
+                    else {
+                        double val = decimal;
+                        while (val >= 1) {
+                            val /= 10;
+                        }
+                        val += whole;
+                        values.push(new ExprValDouble(val));
+                    }
                 }
+                // Whole number
+                else {
+                    values.push(new ExprValInt(whole));
+                }
+                i--;
             }
-            // Whole number
-            else {
-                values.push(new ExprValInt(whole));
+            // Variable
+            else if (tokens[i] == '$') {
+                i++;
+                size_t j = i;
+                while (i < tokens.size() && isalpha(tokens[i])) { i++; }
+
+                string_view key = tokens.substr(j, i - j);
+                const ExprVal* v = storage.GetVal(key);
+                values.push(v);
+                i--;
             }
-            i--;
-        }
-        // Variable
-        else if (tokens[i] == '$') {
-            i++;
-            size_t j = i;
-            while (i < tokens.size() && isalpha(tokens[i])) { i++; }
-            
-            string_view key = tokens.substr(j, i-j);
-            const ExprVal* v = storage.GetVal(key);
-            values.push(v);
-            i--;
-        }
-        else if (tokens[i] == ')')
-        {
-            while (!ops.empty() && ops.top() != '(')
+            else if (tokens[i] == ')')
             {
-                const ExprVal* val2 = values.top();
-                values.pop();
+                while (!ops.empty() && ops.top() != '(')
+                {
+                    if (values.size() == 0) return nullptr;
+                    const ExprVal* val2 = values.top();
+                    values.pop();
 
-                const ExprVal* val1 = values.top();
-                values.pop();
+                    if (values.size() == 0) return nullptr;
+                    const ExprVal* val1 = values.top();
+                    values.pop();
 
-                char op = ops.top();
-                ops.pop();
+                    char op = ops.top();
+                    ops.pop();
 
-                ExprVal* opRes = applyOp(val1, val2, op);
-                if (opRes == nullptr) return nullptr;
+                    ExprVal* opRes = applyOp(val1, val2, op);
+                    if (opRes == nullptr) return nullptr;
+                }
+
+                // Pop opening brace.
+                if (!ops.empty())
+                    ops.pop();
             }
+            // Operator
+            else
+            {
+                while (!ops.empty() && precedence(ops.top())
+                    >= precedence(tokens[i])) {
+                    if (values.size() == 0) return nullptr;
+                    const ExprVal* val2 = values.top();
+                    values.pop();
 
-            // Pop opening brace.
-            if (!ops.empty())
-                ops.pop();
+                    if (values.size() == 0) return nullptr;
+                    const ExprVal* val1 = values.top();
+                    values.pop();
+
+                    char op = ops.top();
+                    ops.pop();
+
+                    ExprVal* opRes = applyOp(val1, val2, op);
+                    if (opRes == nullptr) return nullptr;
+                    values.push(opRes);
+                }
+
+                ops.push(tokens[i]);
+            }
         }
-        // Operator
-        else
-        {
-            while (!ops.empty() && precedence(ops.top())
-                >= precedence(tokens[i])) {
-                const ExprVal* val2 = values.top();
-                values.pop();
 
-                const ExprVal* val1 = values.top();
-                values.pop();
+        // Rest
+        while (!ops.empty()) {
+            char op = ops.top();
+            ops.pop();
 
-                char op = ops.top();
-                ops.pop();
+            if (values.size() == 0) return nullptr;
+            const ExprVal* val2 = values.top();
+            values.pop();
 
-                ExprVal* opRes = applyOp(val1, val2, op);
-                if (opRes == nullptr) return nullptr;
-                values.push(opRes);
-            }
+            if ((op == '-' || op == '+') && values.size() == 0)
+                values.push(new ExprValInt(0));
+            
+            if (values.size() == 0) return nullptr;
+            const ExprVal* val1 = values.top();
+            values.pop();
 
-            ops.push(tokens[i]);
+            ExprVal* opRes = applyOp(val1, val2, op);
+            if (opRes == nullptr) return nullptr;
+            values.push(opRes);
         }
     }
-    
-    // Rest
-    while (!ops.empty()) {
-        const ExprVal* val2 = values.top();
-        values.pop();
-
-        const ExprVal* val1 = values.top();
-        values.pop();
-
-        char op = ops.top();
-        ops.pop();
-
-        ExprVal* opRes = applyOp(val1, val2, op);
-        if (opRes == nullptr) return nullptr;
-        values.push(opRes);
+    catch (...) {
+        return nullptr;
     }
 
     // Return result
