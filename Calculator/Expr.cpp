@@ -205,8 +205,6 @@ ExprVal* Expr::evaluate(const string_view& tokens) const {
     return values.size() == 1 ? values.top() : nullptr; 
 }
 
-
-
 Expr::Expr(const string& strExpr, Storage& storage) : str(strExpr), storage(storage) {}
 
 const ExprVal* Expr::Evaluate() const
