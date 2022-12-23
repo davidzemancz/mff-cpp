@@ -4,8 +4,11 @@
 
 class ExprVal {
 
+
 public:
     const static std::string INVALID;
+
+    bool IsStored;
 
     virtual ExprVal* Plus(const ExprVal* expr) const = 0;
     virtual ExprVal* Minus(const ExprVal* expr) const = 0;

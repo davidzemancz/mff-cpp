@@ -3,7 +3,7 @@
 class Expr
 {
 private:
-	const ExprVal* evaluate(const string_view& tokens) const ;
+	ExprVal* evaluate(const string_view& tokens) const ;
 
 public:
 	const string& str;

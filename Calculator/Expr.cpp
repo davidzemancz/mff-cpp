@@ -30,13 +30,17 @@ ExprVal* applyOp(const ExprVal* a, const ExprVal* b, char op) {
     return nullptr;
 }
 
+void deleteExprVal(const ExprVal* exprVal) {
+    if (!exprVal->IsStored) delete exprVal;
+}
+
 // Function that returns value of
 // expression after evaluation.
-const ExprVal* Expr::evaluate(const string_view& tokens) const {
+ExprVal* Expr::evaluate(const string_view& tokens) const {
     size_t i;
 
     // stack to store integer values.
-    stack <const ExprVal*> values;
+    stack <ExprVal*> values;
 
     // stack to store operators.
     stack <char> ops;
@@ -109,7 +113,8 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
                 while (i < tokens.size() && isalpha(tokens[i])) { i++; }
 
                 string_view key = tokens.substr(j, i - j);
-                const ExprVal* v = storage.GetVal(key);
+                ExprVal* v = storage.GetVal(key);
+                v->IsStored = true;
                 values.push(v);
                 i--;
             }
@@ -127,10 +132,13 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
 
                     char op = ops.top();
                     ops.pop();
-
+                    
                     ExprVal* opRes = applyOp(val1, val2, op);
                     if (opRes == nullptr) return nullptr;
                     values.push(opRes);
+
+                    deleteExprVal(val1);
+                    deleteExprVal(val2);
                 }
 
                 // Pop opening brace.
@@ -156,6 +164,9 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
                     ExprVal* opRes = applyOp(val1, val2, op);
                     if (opRes == nullptr) return nullptr;
                     values.push(opRes);
+
+                    deleteExprVal(val1);
+                    deleteExprVal(val2);
                 }
 
                 ops.push(tokens[i]);
@@ -181,6 +192,9 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
             ExprVal* opRes = applyOp(val1, val2, op);
             if (opRes == nullptr) return nullptr;
             values.push(opRes);
+
+            deleteExprVal(val1);
+            deleteExprVal(val2);
         }
     }
     catch (...) {
@@ -190,6 +204,7 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
     // Return result
     return values.size() == 1 ? values.top() : nullptr; 
 }
+
 
 
 Expr::Expr(const string& strExpr, Storage& storage) : str(strExpr), storage(storage) {}
@@ -202,7 +217,7 @@ const ExprVal* Expr::Evaluate() const
     
     string_view strView(str.c_str());
     if (isAssignment) {
-        const ExprVal* res = evaluate(strView.substr(i));
+        ExprVal* res = evaluate(strView.substr(i));
         storage.SetVal(strView.substr(0, i-1), res);
         return res;
     }
