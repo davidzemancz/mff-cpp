@@ -56,5 +56,53 @@
       <Filter>Tests</Filter>
     </None>
     <None Include="Tests.md" />
+    <None Include="Test3.in">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test3.out">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test4.in">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test4.out">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test5.in">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test5.out">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test6.in">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test6.out">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test7.in">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test7.out">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test8.in">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test8.out">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test9.in">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test9.out">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test10.in">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test10.out">
+      <Filter>Tests</Filter>
+    </None>
   </ItemGroup>
 </Project>

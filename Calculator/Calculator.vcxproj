@@ -155,8 +155,24 @@
   <ItemGroup>
     <None Include="Test1.in" />
     <None Include="Test1.out" />
+    <None Include="Test10.in" />
+    <None Include="Test10.out" />
     <None Include="Test2.in" />
     <None Include="Test2.out" />
+    <None Include="Test3.in" />
+    <None Include="Test3.out" />
+    <None Include="Test4.in" />
+    <None Include="Test4.out" />
+    <None Include="Test5.in" />
+    <None Include="Test5.out" />
+    <None Include="Test6.in" />
+    <None Include="Test6.out" />
+    <None Include="Test7.in" />
+    <None Include="Test7.out" />
+    <None Include="Test8.in" />
+    <None Include="Test8.out" />
+    <None Include="Test9.in" />
+    <None Include="Test9.out" />
     <None Include="Tests.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
