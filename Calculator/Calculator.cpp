@@ -77,10 +77,8 @@ bool filesAreSame(fs::path& path) {
 		std::istreambuf_iterator<char>(f2.rdbuf()));
 }
 
-int runTests()
+int runTests(const string& testDir)
 {
-	const string testDir = "C:\\Users\\david\\OneDrive\\MFFUK\\3-1\\C++\\mff-cpp\\Calculator";
-
 	// Run tests
 	for (const auto& entry : fs::directory_iterator(testDir)) {
 		auto path = entry.path();
@@ -89,9 +87,6 @@ int runTests()
 			ifstream inFile(path);
 			string commentLine;
 			getline(inFile, commentLine);
-
-			// TODO: remove
-			if (commentLine == "") continue;
 
 			runTest(path);
 			
@@ -108,7 +103,7 @@ int runTests()
 int main(int argc, char* argv[]) {
 
 	//run();
-	runTests();
+	runTests("C:\\Users\\david\\OneDrive\\MFFUK\\3-1\\C++\\mff-cpp\\Calculator");
 
 	return 0;
 }
