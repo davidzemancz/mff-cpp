@@ -49,5 +49,12 @@
     <None Include="Test1.out">
       <Filter>Tests</Filter>
     </None>
+    <None Include="Test2.in">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Test2.out">
+      <Filter>Tests</Filter>
+    </None>
+    <None Include="Tests.md" />
   </ItemGroup>
 </Project>

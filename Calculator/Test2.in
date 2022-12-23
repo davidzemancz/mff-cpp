@@ -1,0 +1,7 @@
+# Basic arithmetics with floating point numbers
+1.0f+1
+1.1f+1.1f
+1+1.1
+2.854+4.632
+2.001+0.001
+0.000001+0.000001

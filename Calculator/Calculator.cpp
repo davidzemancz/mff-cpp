@@ -20,6 +20,8 @@ int run() {
 	string strExpr;
 	while (getline(cin, strExpr) && strExpr != "")
 	{
+		if (strExpr[0] == '#') continue; // Skip comments
+
 		string exprName;
 		const ExprVal* res = Expr(strExpr, storage).Evaluate();
 		if (res == nullptr) cout << ExprVal::INVALID << endl;
@@ -84,11 +86,15 @@ int runTests()
 		auto path = entry.path();
 		auto fn = path.filename();
 		if (fn.extension() == ".in" && fn.string().substr(0, 4) == "Test") {
+			ifstream inFile(path);
+			string commentLine;
+			getline(inFile, commentLine);
+
 			runTest(path);
-			if (filesAreSame(path))
-				std::cout << fn << " OK" << std::endl;
-			else
-				std::cout << fn << " failed" << std::endl;
+			
+			string status = filesAreSame(path) ? "  OK  " : "failed";
+
+			std::cout << fn << " | " << status << " | " << commentLine.substr(2)  << std::endl;
 		}
 	}
 

@@ -48,12 +48,13 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
             if (tokens[i] == ' ') {
                 continue;
             }
+
             else if (tokens[i] == '(') {
                 ops.push(tokens[i]);
             }
             else if (isdigit(tokens[i])) {
                 int whole = 0;
-                int decimal = 0;
+                int decimal = 1; // Set to 1 because of .0001 numbers, needs to be subtracted later
                 bool dotFound = false;
 
                 // Read number
@@ -76,9 +77,10 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
                     // Float
                     if (i < tokens.length() && tokens[i] == 'f') {
                         float val = decimal;
-                        while (val >= 1) {
+                        while (val >= 10) {
                             val /= 10;
                         }
+                        val -= 1; // Subtract that 1 mentioned before
                         val += whole;
                         values.push(new ExprValFloat(val));
                         i++;
@@ -86,9 +88,10 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
                     // Double
                     else {
                         double val = decimal;
-                        while (val >= 1) {
+                        while (val >= 10) {
                             val /= 10;
                         }
+                        val -= 1; // Subtract that 1 mentioned before
                         val += whole;
                         values.push(new ExprValDouble(val));
                     }

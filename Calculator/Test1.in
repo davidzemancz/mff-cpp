@@ -1,4 +1,5 @@
+# Basic arithmetics with whole numbers
 1+1
-1.1+2.2f
 12.3 + 3 - 2
 1-10-5+2
+-1
