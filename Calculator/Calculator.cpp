@@ -90,6 +90,9 @@ int runTests()
 			string commentLine;
 			getline(inFile, commentLine);
 
+			// TODO: remove
+			if (commentLine == "") continue;
+
 			runTest(path);
 			
 			string status = filesAreSame(path) ? "  OK  " : "failed";

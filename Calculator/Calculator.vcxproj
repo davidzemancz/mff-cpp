@@ -155,8 +155,6 @@
   <ItemGroup>
     <None Include="Test1.in" />
     <None Include="Test1.out" />
-    <None Include="Test10.in" />
-    <None Include="Test10.out" />
     <None Include="Test2.in" />
     <None Include="Test2.out" />
     <None Include="Test3.in" />
@@ -173,7 +171,7 @@
     <None Include="Test8.out" />
     <None Include="Test9.in" />
     <None Include="Test9.out" />
-    <None Include="Tests.md" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

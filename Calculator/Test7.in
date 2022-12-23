@@ -1,0 +1,11 @@
+# Variable asignment
+x= 13+7*2-(14*(2+7))
+$x
+y= 11
+$y
+$Y
+z=$y
+$z
+$Z
+lucka=17
+$LuCka

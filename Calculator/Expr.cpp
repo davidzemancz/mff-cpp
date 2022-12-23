@@ -130,6 +130,7 @@ const ExprVal* Expr::evaluate(const string_view& tokens) const {
 
                     ExprVal* opRes = applyOp(val1, val2, op);
                     if (opRes == nullptr) return nullptr;
+                    values.push(opRes);
                 }
 
                 // Pop opening brace.
@@ -202,7 +203,7 @@ const ExprVal* Expr::Evaluate() const
     string_view strView(str.c_str());
     if (isAssignment) {
         const ExprVal* res = evaluate(strView.substr(i));
-        storage.SetVal(string(strView.substr(0, i-1)), res);
+        storage.SetVal(strView.substr(0, i-1), res);
         return res;
     }
     else {

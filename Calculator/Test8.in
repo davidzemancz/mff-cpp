@@ -1,0 +1,7 @@
+# Variable usage in expression
+x=162
+Y=$x-2*$x
+y=17
+z=$y*$x
+z=$Z-5.0
+($X+$y)/($z/100+2)

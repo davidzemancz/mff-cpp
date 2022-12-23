@@ -15,6 +15,7 @@
     </Filter>
     <Filter Include="Tests">
       <UniqueIdentifier>{56b68172-8d88-4f82-a4fd-87f5071be017}</UniqueIdentifier>
+      <Extensions>in;out</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -55,7 +56,7 @@
     <None Include="Test2.out">
       <Filter>Tests</Filter>
     </None>
-    <None Include="Tests.md" />
+    <None Include="README.md" />
     <None Include="Test3.in">
       <Filter>Tests</Filter>
     </None>
@@ -96,12 +97,6 @@
       <Filter>Tests</Filter>
     </None>
     <None Include="Test9.out">
-      <Filter>Tests</Filter>
-    </None>
-    <None Include="Test10.in">
-      <Filter>Tests</Filter>
-    </None>
-    <None Include="Test10.out">
       <Filter>Tests</Filter>
     </None>
   </ItemGroup>

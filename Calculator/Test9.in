@@ -1,0 +1,11 @@
+# Invalid inputs
+16++2
+x== 14
+x = 2
+$z+2
+--5
+((2+2)
+let me pass
+6 + $12
+y=x
+ z=3
